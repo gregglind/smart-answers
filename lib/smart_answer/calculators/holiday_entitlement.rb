@@ -14,7 +14,6 @@ module SmartAnswer::Calculators
       28 * fraction_of_year
     end
 
-
     def casual_irregular_entitlement
       minutes = 5.6 / 46.4 * total_hours * 60
       minutes.floor.divmod(60)
@@ -80,7 +79,7 @@ module SmartAnswer::Calculators
 
     def leave_year_start_end
       if self.leave_year_start_date
-        date_leave_year_start_date = Date.parse leave_year_start_date
+        date_leave_year_start_date = Date.parse "#{Date.today.year}-#{leave_year_start_date}"
 
         needs_offset = date_calc >= date_of_year(date_leave_year_start_date, date_calc.year)
         number_years = date_calc.year - (needs_offset ? 0 : 1)
@@ -108,8 +107,10 @@ module SmartAnswer::Calculators
       days_divide = feb29th_in_range(leave_year_start, leave_year_end) ? 366 : 365
 
       if self.start_date
+        puts "#{self.start_date} (#{leave_year_end} - #{date_calc} + 1) / #{days_divide}"
         (leave_year_end - date_calc + 1) / days_divide
       else
+        puts "(#{date_calc} - #{leave_year_start} + 1) / #{days_divide}"
         (date_calc - leave_year_start + 1) / days_divide
       end
     end

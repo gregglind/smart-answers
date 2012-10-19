@@ -31,7 +31,7 @@ date_question :what_is_your_leaving_date? do
   next_node :when_does_your_leave_year_start?
 end
 
-date_question :when_does_your_leave_year_start? do
+annual_date_question :when_does_your_leave_year_start? do
   from { Date.civil(Date.today.year, 1, 1) }
   to { Date.civil(Date.today.year, 12, 31) }
   save_input_as :leave_year_start_date

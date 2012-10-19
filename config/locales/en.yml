@@ -5,6 +5,7 @@ en-GB:
   date:
     formats:
       long: "%e %B %Y"
+      day_month_long: "%e %B"
   flow:
     defaults:
       error_message: Please answer this question
