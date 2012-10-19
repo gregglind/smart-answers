@@ -85,35 +85,35 @@ module SmartAnswer::Calculators
         context "with a start date" do
           context "start date before leave_year_start" do
             should "return the fraction of a year" do
-              calc = HolidayEntitlement.new(:start_date => '2011-01-21', :leave_year_start_date => '2011-02-01')
+              calc = HolidayEntitlement.new(:start_date => '2011-01-21', :leave_year_start_date => '02-01')
               assert_equal '0.0301', sprintf('%.4f', calc.fraction_of_year)
             end
 
             should "return the fraction of a year in a leap year" do
               # 2011-12-31 to 2012-12-30
-              calc = HolidayEntitlement.new(:start_date => '2012-02-02', :leave_year_start_date => '2012-12-31')
+              calc = HolidayEntitlement.new(:start_date => '2012-02-02', :leave_year_start_date => '12-31')
               assert_equal '0.9098', sprintf('%.4f', calc.fraction_of_year)
             end
 
             should "return the fraction of a year in a leap year not covering Feb 29th" do
-              calc = HolidayEntitlement.new(:start_date => '2013-01-21', :leave_year_start_date => '2013-02-01')
+              calc = HolidayEntitlement.new(:start_date => '2013-01-21', :leave_year_start_date => '02-01')
               assert_equal '0.0301', sprintf('%.4f', calc.fraction_of_year)
             end
           end # context - start date before leave_year_start
 
           context "start date after leave_year_start" do
             should "return the fraction of a year" do
-              calc = HolidayEntitlement.new(:start_date => '2011-04-21', :leave_year_start_date => '2011-02-01')
+              calc = HolidayEntitlement.new(:start_date => '2011-04-21', :leave_year_start_date => '02-01')
               assert_equal '0.7836', sprintf('%.4f', calc.fraction_of_year)
             end
 
             should "return the fraction of a year in a leap year" do
-               calc = HolidayEntitlement.new(:start_date => '2012-02-21', :leave_year_start_date => '2012-02-01')
+               calc = HolidayEntitlement.new(:start_date => '2012-02-21', :leave_year_start_date => '02-01')
                assert_equal '0.9454', sprintf('%.4f', calc.fraction_of_year)
             end
 
             should "return the fraction of a year in a leap year not covering Feb 29th" do
-              calc = HolidayEntitlement.new(:start_date => '2012-04-21', :leave_year_start_date => '2012-02-01')
+              calc = HolidayEntitlement.new(:start_date => '2012-04-21', :leave_year_start_date => '02-01')
               assert_equal '0.7814', sprintf('%.4f', calc.fraction_of_year)
             end
           end # context - start date after leave_year_start
@@ -122,34 +122,34 @@ module SmartAnswer::Calculators
         context "with a leave date" do
           context "leaving date before leave_year_start" do
             should "return the fraction of a year" do
-              calc = HolidayEntitlement.new(:leaving_date => '2011-01-21', :leave_year_start_date => '2011-02-01')
+              calc = HolidayEntitlement.new(:leaving_date => '2011-01-21', :leave_year_start_date => '02-01')
               assert_equal '0.9726', sprintf('%.4f', calc.fraction_of_year)
             end
 
             should "return the fraction of a year in a leap year" do
-              calc = HolidayEntitlement.new(:leaving_date => '2013-01-21', :leave_year_start_date => '2013-02-01')
+              calc = HolidayEntitlement.new(:leaving_date => '2013-01-21', :leave_year_start_date => '02-01')
               assert_equal '0.9727', sprintf('%.4f', calc.fraction_of_year)
             end
 
             should "return the fraction of a year in a leap year not covering Feb 29th" do
-              calc = HolidayEntitlement.new(:leaving_date => '2012-01-21', :leave_year_start_date => '2012-03-01')
+              calc = HolidayEntitlement.new(:leaving_date => '2012-01-21', :leave_year_start_date => '03-01')
               assert_equal '0.8934', sprintf('%.4f', calc.fraction_of_year)
             end
           end # context - leaving date before leave_year_start
 
           context "leaving date after leave_year_start" do
             should "return the fraction of a year" do
-              calc = HolidayEntitlement.new(:leaving_date => '2011-04-21', :leave_year_start_date => '2011-02-01')
+              calc = HolidayEntitlement.new(:leaving_date => '2011-04-21', :leave_year_start_date => '02-01')
               assert_equal '0.2192', sprintf('%.4f', calc.fraction_of_year)
             end
 
             should "return the fraction of a year in a leap year" do
-              calc = HolidayEntitlement.new(:leaving_date => '2012-04-21', :leave_year_start_date => '2012-02-01')
+              calc = HolidayEntitlement.new(:leaving_date => '2012-04-21', :leave_year_start_date => '02-01')
               assert_equal '0.2213', sprintf('%.4f', calc.fraction_of_year)
             end
 
             should "return the fraction of a year in a leap year not covering Feb 29th" do
-              calc = HolidayEntitlement.new(:leaving_date => '2012-02-21', :leave_year_start_date => '2012-02-01')
+              calc = HolidayEntitlement.new(:leaving_date => '2012-02-21', :leave_year_start_date => '02-01')
               assert_equal '0.0574', sprintf('%.4f', calc.fraction_of_year)
             end
           end # context - leaving date after leave_year_start
