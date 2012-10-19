@@ -7,7 +7,6 @@ module SmartAnswer
         super
       end
       def parse_input(input)
-        puts "AnnualDate#parse_input(#{input})"
         date = case input
         when Hash, ActiveSupport::HashWithIndifferentAccess
           input = input.symbolize_keys
