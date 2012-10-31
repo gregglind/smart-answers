@@ -31,9 +31,11 @@ en-GB:
           + £%{ssp_payment} in total
           + for %{days_paid} days taken off sick between %{sick_start_date} and %{sick_end_date}
 
-          The first 3 days of any period of illness (or any linked periods of illness separated by less than 8 weeks) won’t be paid. The payment amount will reflect this.
+          The first 3 days of any period of illness (or any linked periods of illness separated by less than 8 
+          weeks) won’t be paid. The payment amount will reflect this.
 
-          SSP can be paid for up to 28 weeks of an employee’s normal workdays. For this employee that equals a total of %{max_days_payable} days. After that you must give them form SSP1 within 7 days of SSP ending. They may be able to get [Employment Support Allowance (ESA).](https://www.gov.uk/employment-support-allowance "Benefits & credits: employment support allowance (ESA)")
+          SSP can be paid for up to 28 weeks of an employee’s normal workdays. For this employee that equals a 
+          total of %{max_days_payable} days. After that you must give them form SSP1 within 7 days of SSP ending. They may be able to get [Employment Support Allowance (ESA).](https://www.gov.uk/employment-support-allowance "Benefits & credits: employment support allowance (ESA)")
 
 
           $D
@@ -43,7 +45,7 @@ en-GB:
 
           There are also [records you must keep](https://www.gov.uk/sick-leave-pay-employees/entitlement "Sick pay for your employees: Entitlement") and rules on [proof of illness](https://www.gov.uk/sick-leave-pay-employees/notice-and-fit-notes "Sick pay for your employees: notice and fit notes") you can ask for.
 
-          You may be able to [recover the statutory payments](http://www.hmrc.gov.uk/paye/employees/statutory-pay/ssp-calc.htm "How to calculate and recover Statutory Sick Pay") you’ve paid from HM Revenue & Customs (HMRC). 
+          You may be able to [recover the statutory payments](http://www.hmrc.gov.uk/paye/employees/statutory-pay/ssp-calc.htm "How to calculate and recover Statutory Sick Pay") you've paid from HM Revenue & Customs (HMRC). 
           Your payroll software or [HMRC&apos;s basic PAYE tools](http://www.hmrc.gov.uk/paye/tools/basic-paye-tools.htm "Using HMRC's Basic PAYE Tools") can tell you how much you’ll get back.
 
           *[SSP]: Statutory Sick Pay
@@ -120,10 +122,17 @@ en-GB:
       how_many_days_worked?:
         title: How many days per week do they work?
         error_message: Please enter a number between 1 and 7
+
+      ## Q13a
+      how_many_waiting_days?:
+        title: How many waiting days have been used during any previous illness?
+        hint: Waiting days are the first 3 normal working dates during a period of illness.
+        error_message: Please enter a number up to 3
+
       ## Q14
       normal_workdays_taken_as_sick?:
         title: How many of their normal workdays did your employee take off sick between %{sick_start_date} and %{sick_end_date}?
-        hint: ‘Normal workdays’ are the days of the week your employee works on a regular basis
+        hint: 'Normal workdays' are the days of the week your employee works on a regular basis
         error_message: Please enter a number up to %{total_days_sick}
 
 
@@ -176,4 +185,15 @@ en-GB:
           %{warning_message}
 
           %{outcome_text}
+
+      ## A8
+      not_entitled_maximum_reached:
+        body: |
+          ##Your employee isn’t entitled to Statutory Sick Pay because they’ve already received the maximum amount of SSP (28 weeks). 
+
+          You must send them form SSP1 within 7 days of them going off sick. They may be able to get [Employment Support Allowance (ESA)](https://www.gov.uk/employment-support-allowance "Benefits & credits: employment support allowance (ESA)").
+
+          
+          $D [Download ‘Form SSP1, employee not entitled to SSP’ (PDF, 130KB)](http://www.dwp.gov.uk/advisers/claimforms/ssp1.pdf "Download ‘Statutory Sick Pay and an employee’s claim for benefit’ form"){:rel="external"} $D
+
  

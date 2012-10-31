@@ -110,6 +110,7 @@ end
 
 ## Q11 
 multiple_choice :related_illness? do
+	save_input_as :related_illness_answer
 	option :yes => :how_many_days_missed? 						## Q12
 	option :no => :how_many_days_worked? 						## Q13
 end
@@ -130,34 +131,39 @@ value_question :how_many_days_missed? do
 	next_node :how_many_days_worked? 								## Q13
 end
 
-
 ## Q13
 value_question :how_many_days_worked? do
 	calculate :pattern_days do
 		# ensure we get an integer
 		if ! (responses.last.to_s =~ /\A\d+\z/)
-      		raise SmartAnswer::InvalidResponse
-    	else
+  		raise SmartAnswer::InvalidResponse
+  	else
     	# and one between 1..7
-      		if (1..7).include?(responses.last.to_i)
-      			responses.last.to_i
-      		else
-      			raise SmartAnswer::InvalidResponse
-      		end
-    	end
+  		if (1..7).include?(responses.last.to_i)
+  			responses.last.to_i
+  		else
+  			raise SmartAnswer::InvalidResponse
+  		end
+  	end
 	end
-	calculate :calculator do
-		if prev_sick_days
-			Calculators::StatutorySickPayCalculator.new(prev_sick_days, Date.parse(sick_start_date))
-		else 
-			Calculators::StatutorySickPayCalculator.new(0, Date.parse(sick_start_date))
+	next_node do |response|
+		patt_days = response.to_i
+		
+		if related_illness_answer == "yes"
+			prev_sick_days < (patt_days * 28 + 3) ? :how_many_waiting_days? : :not_entitled_maximum_reached
+		else
+		 :normal_workdays_taken_as_sick?
 		end
 	end
-	calculate :daily_rate do
-		calculator.set_daily_rate(pattern_days)
-		calculator.daily_rate
+end
+
+## Q13a
+value_question :how_many_waiting_days? do
+	calculate :prev_waiting_days do
+		raise SmartAnswer::InvalidResponse unless Integer(responses.last)
+		responses.last.to_i
 	end
-	next_node :normal_workdays_taken_as_sick?		## Q8
+	next_node :normal_workdays_taken_as_sick?
 end
 
 ## Q14
@@ -165,19 +171,45 @@ value_question :normal_workdays_taken_as_sick? do
 	precalculate :total_days_sick do
 		Date.parse(sick_end_date) - Date.parse(sick_start_date)
 	end
+	precalculate :calculator do
+		if prev_sick_days
+ 			Calculators::StatutorySickPayCalculator.new(prev_sick_days, Date.parse(sick_start_date))
+		else
+ 			Calculators::StatutorySickPayCalculator.new(0, Date.parse(sick_start_date))
+		end
+ 	end
+
+	precalculate :waiting_days do
+		if related_illness_answer == "yes"
+			calculator.set_waiting_days(prev_waiting_days) 
+		else
+			0
+		end
+	end
+
+	precalculate :daily_rate do
+		calculator.set_daily_rate(pattern_days)
+		calculator.daily_rate
+	end
+
 
 	calculate :normal_workdays_out do
 		if ! (responses.last.to_s =~ /\A\d+\z/)
-      		raise SmartAnswer::InvalidResponse
-    	else
+  		raise SmartAnswer::InvalidResponse
+  	else
 			if (responses.last.to_i < 1) or (responses.last.to_i > total_days_sick)
-      			raise SmartAnswer::InvalidResponse
-      		else
+  			raise SmartAnswer::InvalidResponse
+  		else
 				calculator.set_normal_work_days(responses.last.to_i)
 				calculator.normal_work_days
-      		end
+  		end
 		end
 	end
+
+	# calculate :days_to_pay do
+	# 	normal_workdays_out - waiting_days
+	# end
+
 	calculate :ssp_payment do
 		sprintf("%.2f", (calculator.ssp_payment < 1 ? 0.0 : calculator.ssp_payment))
 	end
@@ -226,3 +258,7 @@ outcome :entitled_or_not_enough_days do
 		end
 	end
 end
+## A7
+## A8
+outcome :not_entitled_maximum_reached
+

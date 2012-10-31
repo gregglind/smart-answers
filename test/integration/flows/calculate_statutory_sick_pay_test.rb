@@ -7,6 +7,7 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 
   setup do
     setup_for_testing_flow 'calculate-statutory-sick-pay'
+    # @stubbed_calculator = SmartAnswer::Calculators::StatutorySickPayCalculator.new
   end
 
   	should "ask if employee is getting maternity pay" do
@@ -16,9 +17,9 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
   	context "answered yes to maternity" do
   		should "return already_receiving_benefit on maternity answer" do
   			add_response :yes
-			assert_current_node :already_receiving_benefit 
+				assert_current_node :already_receiving_benefit 
+			end
 		end
-	end
 
 	context "answered no to maternity " do
 		setup {add_response :no}
@@ -131,7 +132,10 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 		  									end
 
 		  									context "answer 5 to days worked" do
-		  										setup {add_response '5'}
+		  										setup do
+		  											add_response '5'
+		  											add_response '0' # for waiting days
+		  										end
 
 		  										should "ask for days taken as sick" do
 		  											assert_state_variable "total_days_sick", 10
@@ -139,7 +143,9 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 		  										end
 		  										
 		  										context "answer more sick days than in the period" do
-		  											setup {add_response '13'}
+		  											setup do 
+		  												add_response '13'
+		  											end
 
 		  											should "return an error for 13 days" do
 			  											assert_current_node_is_error
@@ -148,7 +154,9 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 			  									end
 
 			  									context "less than 4 days taken off - no pay" do
-			  										setup {add_response '3'}
+			  										setup do
+			  											add_response '3'
+			  										end
 
 			  										should "display no pay because not enough days" do
 			  											assert_phrase_list :outcome_text, [:first_three_days_not_paid]
@@ -157,7 +165,9 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 			  									end
 
 			  									context "entitled to pay" do
-			  										setup {add_response '8'}
+			  										setup do
+			  											add_response '8'
+			  										end
 
 			  										should "display pay info" do
 			  											assert_phrase_list :outcome_text, [:entitled_info]
@@ -192,7 +202,10 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 	  										end
 
 	  										context "5 days worked" do
-			  									setup {add_response '5'}
+			  									setup do 
+			  										add_response '5'
+			  										add_response '0' # for waiting days
+			  									end
 
 										  		should "ask how may sick days they had" do
 			  										assert_state_variable "pattern_days", 5
@@ -213,7 +226,9 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 			  							end # no to related illness
 			  						
 			  							context "yes to related illness" do
-			  							 	setup {add_response :yes}
+			  							 	setup do
+			  							 		add_response :yes # related illness
+			  							 	end
 
 			  							 	should "ask how many days missed" do
 			  							 		assert_current_node :how_many_days_missed?
@@ -232,8 +247,29 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 	  												assert_current_node :how_many_days_missed?
 													end
 
+													context "entitled or not enough days test" do
+										  			setup do
+										  				add_response 3 # prev sick days
+										  				add_response 3 # pattern days
+										  				add_response 0 # waiting days
+										  				add_response 4 # normal workdays
+										  			end
+										  			should "be on ..." do
+											  			assert_state_variable "prev_sick_days", 3
+											  			# assert_current_node :how_many_days_worked?
+											  			assert_state_variable "pattern_days", 3
+											  			# assert_current_node :how_many_waiting_days?
+											  			assert_state_variable "prev_waiting_days", 0
+											  			# assert_current_node :normal_workdays_taken_as_sick?
+											  			assert_current_node :entitled_or_not_enough_days
+											  		end
+										  		end
+
+
 										  		context "answered 3 sick days during related illness" do
-											  		setup {add_response '3'}
+											  		setup do 
+											  			add_response '3' # prev sick days
+											  		end
 											  		
 											  		should "ask how many days they work" do
 											  			assert_state_variable "prev_sick_days", 3
@@ -257,21 +293,27 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 										  	
 										  			should "ask for days taken as sick if 1" do
 											  			add_response '1'
+											  			add_response '0' # for waiting days
 											  			assert_current_node :normal_workdays_taken_as_sick?
 											  		end
 										  			
 										  			should "ask for days taken as sick if 2" do
 											  			add_response '2'
+											  			add_response '0' # for waiting days
 											  			assert_current_node :normal_workdays_taken_as_sick?
 											  		end
 										  			
 										  			should "ask for days taken as sick if 4" do
 											  			add_response '4'
+											  			add_response '0' # for waiting days
 											  			assert_current_node :normal_workdays_taken_as_sick?
 											  		end
 
 											  		context "3 days worked" do
-												  		setup {add_response '3'}
+												  		setup do
+												  			add_response '3' # pattern days 
+											  				add_response '3' # for waiting days
+											  			end
 
 												  		should "ask how may sick days they had" do
 												  			assert_state_variable "pattern_days", 3
@@ -280,9 +322,12 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 												  		end
 
 												  		context "4 work days out" do
-												  			setup {add_response '4'}
+												  			setup do 
+												  				add_response '4' # normal work days
+												  			end
 
 												  			should "give entitled outcome and 4 days pay" do
+													  			
 													  			assert_state_variable "normal_workdays_out", 4
 													  			assert_state_variable "ssp_payment", "114.47"
 													  			assert_current_node :entitled_or_not_enough_days
@@ -290,7 +335,9 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 												  		end
 
 												  		context "2 work days out" do
-												  			setup {add_response '2'}
+												  			setup do
+												  				add_response '2'
+												  			end
 
 												  			should "give entitled outcome and 2 days' pay" do
 												  				assert_state_variable "normal_workdays_out", 2
@@ -305,26 +352,36 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 											  		setup do 
 											  			add_response 115 # 28 * 4 + 3
 											  			add_response 4 # pattern days
-											  			add_response 6 # normal days
 											  		end
 
-											  		should "display not entitled because max paid previously for 4 pattern days" do
-											  			assert_current_node :entitled_or_not_enough_days
-											  			assert_phrase_list :outcome_text, [:max_paid_during_previous_illness]
+											  		# new calc means that this amount breaches max_amount
+											  		should "be on how_many_waiting_days" do
+											  			assert_current_node :not_entitled_maximum_reached
 											  		end
+
+											  		# should "display not entitled because max paid previously for 4 pattern days" do
+											  		# 	assert_current_node :entitled_or_not_enough_days
+											  		# 	assert_phrase_list :outcome_text, [:max_paid_during_previous_illness]
+											  		# end
 											  	end
 
 											  	context "answered 143 sick days during related illness" do
 											  		setup do 
 											  			add_response 143 # 28 * 5 + 3
 											  			add_response 5 # pattern days
-											  			add_response 8 # normal days
+											  			# add_response 0 # prev_waiting_days
+											  			# add_response 8 # normal days
 											  		end
 
-											  		should "display not entitled because max paid previously for 5 pattern days" do
-											  			assert_current_node :entitled_or_not_enough_days
-											  			assert_phrase_list :outcome_text, [:max_paid_during_previous_illness]
+											  		# new calc means that this amount breaches max_amount
+											  		should "be on how_many_waiting_days" do
+											  			assert_current_node :not_entitled_maximum_reached
 											  		end
+
+											  		# should "display not entitled because max paid previously for 5 pattern days" do
+											  		# 	assert_current_node :entitled_or_not_enough_days
+											  		# 	assert_phrase_list :outcome_text, [:max_paid_during_previous_illness]
+											  		# end
 											  	end
 
 												end # how many days missed
