@@ -1,7 +1,7 @@
 module SmartAnswer::Calculators
   class StatutorySickPayCalculator
   
-    attr_reader :daily_rate, :waiting_days, :normal_work_days, :lower_earning_limit, :ssp_weekly_rate
+    attr_reader :daily_rate, :waiting_days, :normal_work_days, :lower_earning_limit, :ssp_weekly_rate, :prev_waiting_days
     attr_accessor :pattern_days, :normal_work_days
 
     # LEL changes on 1 April each year - update when we know the April 2013 rate
@@ -39,11 +39,14 @@ module SmartAnswer::Calculators
     
     def initialize(prev_sick_days, sick_start_date)
     	@prev_sick_days = prev_sick_days 
+      @prev_waiting_days = 0 # default value; call set_waiting_days
       @waiting_days = 3 # default value; call set_waiting_days
       @sick_start_date = sick_start_date
     end
 
+    # unused waiting days carry over from previous period, but max 3 in total
     def set_waiting_days(prev_waiting_days)
+      @prev_waiting_days = prev_waiting_days
       @waiting_days =  [3 - prev_waiting_days, 0].max
     end
 
@@ -62,16 +65,12 @@ module SmartAnswer::Calculators
       28 * @pattern_days
     end
 
-    def days_paid_in_linked_period
-      if @prev_sick_days > 3
-        @prev_sick_days - 3
-      else
-        0
-      end
+    def prev_days_paid
+      @prev_sick_days - @prev_waiting_days
     end
 
     def days_that_can_be_paid_for_this_period
-      [max_days_that_can_be_paid - days_paid_in_linked_period, 0].max
+      [max_days_that_can_be_paid - prev_days_paid, 0].max
     end
 
     def days_to_pay

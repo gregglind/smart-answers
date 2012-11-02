@@ -150,10 +150,9 @@ value_question :how_many_days_worked? do
 		patt_days = response.to_i
 		
 		if related_illness_answer == "yes"
-      puts "\n#{prev_sick_days} < (#{patt_days} * 28 + 3) = #{(patt_days * 28 + 3)}"
 			prev_sick_days < (patt_days * 28 + 3) ? :how_many_waiting_days? : :not_entitled_maximum_reached
 		else
-		 :normal_workdays_taken_as_sick?
+			:normal_workdays_taken_as_sick?
 		end
 	end
 end
@@ -162,6 +161,12 @@ end
 value_question :how_many_waiting_days? do
 	calculate :prev_waiting_days do
 		raise SmartAnswer::InvalidResponse unless Integer(responses.last)
+		# and one between 1..7
+  	if (0..3).include?(responses.last.to_i)
+  		responses.last.to_i
+  	else
+  		raise SmartAnswer::InvalidResponse
+  	end
 		responses.last.to_i
 	end
 	next_node :normal_workdays_taken_as_sick?
@@ -182,8 +187,10 @@ value_question :normal_workdays_taken_as_sick? do
 
 	precalculate :waiting_days do
 		if related_illness_answer == "yes"
-			calculator.set_waiting_days(prev_waiting_days) 
+			calculator.set_waiting_days(prev_waiting_days)
+			prev_waiting_days
 		else
+			calculator.set_waiting_days(0)
 			0
 		end
 	end
@@ -207,15 +214,17 @@ value_question :normal_workdays_taken_as_sick? do
 		end
 	end
 
-	# calculate :days_to_pay do
-	# 	normal_workdays_out - waiting_days
-	# end
-
 	calculate :ssp_payment do
 		sprintf("%.2f", (calculator.ssp_payment < 1 ? 0.0 : calculator.ssp_payment))
 	end
 
-	next_node :entitled_or_not_enough_days
+	next_node do |response|
+		if calculator.days_that_can_be_paid_for_this_period == 0
+			:not_entitled_maximum_reached
+		else
+			:entitled_or_not_enough_days
+		end
+	end
 end
 
 ## Outcomes
@@ -252,8 +261,6 @@ outcome :entitled_or_not_enough_days do
 	precalculate :outcome_text do
     if calculator.ssp_payment >= 1 
 			PhraseList.new(:entitled_info)
-		elsif calculator.days_that_can_be_paid_for_this_period == 0
-			PhraseList.new(:max_paid_during_previous_illness)
 		else
 			PhraseList.new(:first_three_days_not_paid)
 		end

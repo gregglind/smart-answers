@@ -52,9 +52,6 @@ en-GB:
         first_three_days_not_paid: |
           ##Your employee isn’t entitled to Statutory Sick Pay because the first 3 days of illness aren’t paid.
 
-        max_paid_during_previous_illness: |
-          ## Your employee isn’t entitled to Statutory Sick Pay because they’ve been paid the statutory maximum for the previous illness.
-
       ## Q1
       getting_maternity_pay?:
         title: Is your employee getting Statutory Maternity Pay or Maternity Allowance?
@@ -97,6 +94,7 @@ en-GB:
       what_was_average_weekly_pay?:
         title: What was their average weekly pay, before deductions, before %{sick_start_date}?
         error_message: Please enter a number greater than 0
+        suffix_label: per week
 
       ## Q10
       what_was_average_weekly_earnings?:
@@ -104,6 +102,7 @@ en-GB:
         body: |
           If they were the director of a company incorporated before 1 October 2009 the rules can be complex - see page 28 of the [Employee Helpbook for Statutory Sick Pay](http://www.hmrc.gov.uk/helpsheets/e14.pdf "Employee Helpbook for Statutory Sick Pay"){:rel="external"}
         error_message: Please enter a number greater than 0
+        suffix_label: per week
 
       ## Q11
       related_illness?:
@@ -115,7 +114,7 @@ en-GB:
       ## Q12
       how_many_days_missed?:
         title: During the previous illness, how many of their normal workdays did your employee take off sick?
-        hint: ‘Normal workdays’ are the days of the week your employee works on a regular basis.
+        hint: Normal workdays are the days of the week your employee works on a regular basis.
         error_message: Please enter a number greater than 0
 
       ## Q13
@@ -132,7 +131,7 @@ en-GB:
       ## Q14
       normal_workdays_taken_as_sick?:
         title: How many of their normal workdays did your employee take off sick between %{sick_start_date} and %{sick_end_date}?
-        hint: 'Normal workdays' are the days of the week your employee works on a regular basis
+        hint: Normal workdays are the days of the week your employee works on a regular basis
         error_message: Please enter a number up to %{total_days_sick}
 
 
