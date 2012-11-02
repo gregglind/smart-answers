@@ -178,22 +178,12 @@ value_question :normal_workdays_taken_as_sick? do
 		Date.parse(sick_end_date) - Date.parse(sick_start_date)
 	end
 	precalculate :calculator do
-		if prev_sick_days
- 			Calculators::StatutorySickPayCalculator.new(prev_sick_days, Date.parse(sick_start_date))
+		if prev_sick_days # there should also always be prev_waiting_days in this case
+ 			Calculators::StatutorySickPayCalculator.new(prev_sick_days, Date.parse(sick_start_date), prev_waiting_days)
 		else
- 			Calculators::StatutorySickPayCalculator.new(0, Date.parse(sick_start_date))
+ 			Calculators::StatutorySickPayCalculator.new(0, Date.parse(sick_start_date), 0)
 		end
  	end
-
-	precalculate :waiting_days do
-		if related_illness_answer == "yes"
-			calculator.set_waiting_days(prev_waiting_days)
-			prev_waiting_days
-		else
-			calculator.set_waiting_days(0)
-			0
-		end
-	end
 
 	precalculate :daily_rate do
 		calculator.set_daily_rate(pattern_days)

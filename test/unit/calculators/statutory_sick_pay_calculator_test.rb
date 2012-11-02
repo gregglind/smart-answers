@@ -5,22 +5,17 @@ module SmartAnswer::Calculators
   class StatutorySickPayCalculatorTest < ActiveSupport::TestCase
 
   	context StatutorySickPayCalculator do
-  		context "prev_sick_days is 5" do
+  		context "prev_sick_days is 5, prev_waiting_days is 3" do
 	  		setup do
-	  			@calculator = StatutorySickPayCalculator.new(5, Date.parse("1 October 2012"))
+	  			@calculator = StatutorySickPayCalculator.new(5, Date.parse("1 October 2012"), 3)
 	  			@calculator.set_normal_work_days(3)
 	  			@calculator.set_daily_rate(4)
-	  			@calculator.set_waiting_days(3)	
 	  		end
 
-	  		should "return waiting_days of 0" do
-	  			@calculator.set_waiting_days(4)	
+	  		should "return waiting_days of 0" do	
 	  			assert_equal 0, @calculator.waiting_days
 	  		end
 
-	  		should "return waiting_days of 0" do
-	  			assert_equal 0, @calculator.waiting_days
-	  		end
 
 	  		should "return daily rate of 21.4625" do
 	  			assert_equal @calculator.daily_rate, 21.4625
@@ -72,29 +67,26 @@ module SmartAnswer::Calculators
 	  		end	  	
 	  	end
 
-	  	context "prev_sick_days is 3" do
-	  		setup {@calculator = StatutorySickPayCalculator.new(3, Date.parse("6 April 2012"))}
+	  	context "prev_sick_days is 3, prev_waiting_days is 3" do
+	  		setup {@calculator = StatutorySickPayCalculator.new(3, Date.parse("6 April 2012"), 3)}
 
 	  		should "return waiting_days of 0" do
-	  			@calculator.set_waiting_days(3)
 	  			assert_equal @calculator.waiting_days, 0
 	  		end
 	  	end
 
-	  	context "prev_sick_days is 2" do
-	  		setup {@calculator = StatutorySickPayCalculator.new(2, Date.parse("6 April 2012"))}
+	  	context "prev_sick_days is 3, prev_waiting_days is 2" do
+	  		setup {@calculator = StatutorySickPayCalculator.new(3, Date.parse("6 April 2012"), 2)}
 
 	  		should "return waiting_days of 1" do
-	  			@calculator.set_waiting_days(2)
 	  			assert_equal @calculator.waiting_days, 1
 	  		end
 	  	end
 
-			context "prev_sick_days is 1" do
-	  		setup {@calculator = StatutorySickPayCalculator.new(1, Date.parse("6 April 2012"))}
+			context "prev_sick_days is 3, prev_waiting_days is 1" do
+	  		setup {@calculator = StatutorySickPayCalculator.new(3, Date.parse("6 April 2012"), 1)}
 
 	  		should "return waiting_days of 2" do
-	  			@calculator.set_waiting_days(1)
 	  			assert_equal 2, @calculator.waiting_days
 	  		end
 	  	end
@@ -166,13 +158,12 @@ module SmartAnswer::Calculators
 	  	# Change this to Monday, Wednesday, Friday
 			context "test scenario 3" do 
 	  		setup do 
-	  			@calculator = StatutorySickPayCalculator.new(24, Date.parse("25 July 2012"))
+	  			@calculator = StatutorySickPayCalculator.new(24, Date.parse("25 July 2012"), 3)
 	  			@calculator.set_daily_rate(3)
 	  			@calculator.set_normal_work_days(18)
 	  		end
 
 	  		should "give correct ssp calculation" do # 18 days with no waiting days, all at 2012-13 daily rate
-	  			@calculator.set_waiting_days(3)
 	  			assert_equal @calculator.daily_rate, 28.6167
 	  			assert_equal @calculator.ssp_payment, 515.10
 	  		end
@@ -195,7 +186,7 @@ module SmartAnswer::Calculators
 	  	# change this to Monday - Thursday
 	  	context "test scenario 5" do
 	  		setup do 
-	  			@calculator = StatutorySickPayCalculator.new(99, Date.parse("29 March 2012"))
+	  			@calculator = StatutorySickPayCalculator.new(99, Date.parse("29 March 2012"), 3)
 	  			@calculator.set_daily_rate(4)
 	  			@calculator.set_normal_work_days(20)
 	  		end
@@ -237,7 +228,7 @@ module SmartAnswer::Calculators
 	  	# additional test scenarios
 	  	context "test scenario 6a - 1 day max to pay" do
 	  		setup do 
-	  			@calculator = StatutorySickPayCalculator.new(114, Date.parse("29 March 2012"))
+	  			@calculator = StatutorySickPayCalculator.new(114, Date.parse("29 March 2012"), 3)
 	  			@calculator.set_daily_rate(4)
 	  			@calculator.set_normal_work_days(20)
 	  		end

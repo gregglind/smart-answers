@@ -37,18 +37,14 @@ module SmartAnswer::Calculators
     end
 
     
-    def initialize(prev_sick_days, sick_start_date)
+    def initialize(prev_sick_days, sick_start_date, prev_waiting_days=0)
     	@prev_sick_days = prev_sick_days 
-      @prev_waiting_days = 0 # default value; call set_waiting_days
-      @waiting_days = 3 # default value; call set_waiting_days
+      @prev_waiting_days = prev_waiting_days
+      # unused waiting days carry over from previous period, but max 3 in total
+      @waiting_days = [3 - prev_waiting_days, 0].max
       @sick_start_date = sick_start_date
     end
 
-    # unused waiting days carry over from previous period, but max 3 in total
-    def set_waiting_days(prev_waiting_days)
-      @prev_waiting_days = prev_waiting_days
-      @waiting_days =  [3 - prev_waiting_days, 0].max
-    end
 
     # TODO use truncate to four decimal places to match unrounded daily rates used by HMRC for 2012-13 for 3 and 7 pattern days
     # The current calculation will match rates for 2011-12 exactly
