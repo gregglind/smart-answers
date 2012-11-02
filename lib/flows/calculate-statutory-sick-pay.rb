@@ -150,6 +150,7 @@ value_question :how_many_days_worked? do
 		patt_days = response.to_i
 		
 		if related_illness_answer == "yes"
+      puts "\n#{prev_sick_days} < (#{patt_days} * 28 + 3) = #{(patt_days * 28 + 3)}"
 			prev_sick_days < (patt_days * 28 + 3) ? :how_many_waiting_days? : :not_entitled_maximum_reached
 		else
 		 :normal_workdays_taken_as_sick?
@@ -233,23 +234,23 @@ outcome :not_earned_enough
 outcome :entitled_or_not_enough_days do
 
 	precalculate :warning_message do
-		if getting_paternity_or_adoption_pay == "yes" and calculator.ssp_payment >= 1
+    if getting_paternity_or_adoption_pay == "yes" and calculator.ssp_payment >= 1
 			PhraseList.new(:paternity_adoption_warning)
 		else
 			''
 		end
 	end
-
-	precalculate :days_paid do
-		calculator.days_to_pay
+	
+  precalculate :days_paid do
+    calculator.days_to_pay
 	end
 
 	precalculate :max_days_payable do
-		calculator.max_days_that_can_be_paid
+    calculator.max_days_that_can_be_paid
 	end
 
 	precalculate :outcome_text do
-		if calculator.ssp_payment >= 1 
+    if calculator.ssp_payment >= 1 
 			PhraseList.new(:entitled_info)
 		elsif calculator.days_that_can_be_paid_for_this_period == 0
 			PhraseList.new(:max_paid_during_previous_illness)

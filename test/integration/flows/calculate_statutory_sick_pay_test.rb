@@ -170,8 +170,7 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 			  										end
 
 			  										should "display pay info" do
-			  											assert_phrase_list :outcome_text, [:entitled_info]
-			  											assert_current_node :entitled_or_not_enough_days
+                              assert_current_node :normal_workdays_taken_as_sick?
 			  										end
 			  									end
 		  									end # days worked
