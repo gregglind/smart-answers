@@ -134,7 +134,6 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 		  									context "answer 5 to days worked" do
 		  										setup do
 		  											add_response '5'
-		  											add_response '0' # for waiting days
 		  										end
 
 		  										should "ask for days taken as sick" do
@@ -170,7 +169,7 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 			  										end
 
 			  										should "display pay info" do
-                              assert_current_node :normal_workdays_taken_as_sick?
+                              assert_current_node :entitled_or_not_enough_days
 			  										end
 			  									end
 		  									end # days worked
@@ -203,7 +202,6 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 	  										context "5 days worked" do
 			  									setup do 
 			  										add_response '5'
-			  										add_response '0' # for waiting days
 			  									end
 
 										  		should "ask how may sick days they had" do
@@ -354,33 +352,23 @@ class CalculateStatutorySickPayTest < ActiveSupport::TestCase
 											  		end
 
 											  		# new calc means that this amount breaches max_amount
-											  		should "be on how_many_waiting_days" do
+											  		should "not be entitled because maximum reached for 4 pattern days" do
 											  			assert_current_node :not_entitled_maximum_reached
 											  		end
 
-											  		# should "display not entitled because max paid previously for 4 pattern days" do
-											  		# 	assert_current_node :entitled_or_not_enough_days
-											  		# 	assert_phrase_list :outcome_text, [:max_paid_during_previous_illness]
-											  		# end
 											  	end
 
 											  	context "answered 143 sick days during related illness" do
 											  		setup do 
 											  			add_response 143 # 28 * 5 + 3
 											  			add_response 5 # pattern days
-											  			# add_response 0 # prev_waiting_days
-											  			# add_response 8 # normal days
 											  		end
 
 											  		# new calc means that this amount breaches max_amount
-											  		should "be on how_many_waiting_days" do
+											  		should "not be entitled because maximum reached for 5 pattern days" do
 											  			assert_current_node :not_entitled_maximum_reached
 											  		end
 
-											  		# should "display not entitled because max paid previously for 5 pattern days" do
-											  		# 	assert_current_node :entitled_or_not_enough_days
-											  		# 	assert_phrase_list :outcome_text, [:max_paid_during_previous_illness]
-											  		# end
 											  	end
 
 												end # how many days missed
